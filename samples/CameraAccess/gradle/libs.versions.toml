@@ -10,6 +10,7 @@ uiAutomator = "2.3.0"
 testRules = "1.7.0"
 uiJunit4 = "1.11.2"
 exifInterface = "1.4.2"
+mlkitBarcode = "17.3.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -26,6 +27,7 @@ androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiaut
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "testRules" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "uiJunit4" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifInterface" }
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

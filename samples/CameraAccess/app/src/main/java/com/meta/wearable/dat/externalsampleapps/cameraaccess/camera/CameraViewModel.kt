@@ -48,6 +48,7 @@ import com.meta.wearable.dat.externalsampleapps.cameraaccess.stream.HevcParamete
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.stream.RecordingResult
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.stream.StreamingService
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.stream.VideoRecorder
+import com.meta.wearable.dat.externalsampleapps.cameraaccess.upi.UpiQrScanner
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.wearables.WearablesViewModel
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -511,6 +512,56 @@ class CameraViewModel(
     }
   }
 
+  // MARK: - UPI Scan & Pay
+
+  private val upiScanner = UpiQrScanner(application)
+  private var upiScanJob: Job? = null
+
+  /**
+   * Takes a glasses photo about every 1.5 s (up to ~20 s) until one contains a UPI QR code, then
+   * opens the UPI app chooser with the payment pre-filled. Tapping again cancels the scan.
+   */
+  fun scanAndPay() {
+    if (_uiState.value.isScanningUpi) {
+      upiScanJob?.cancel()
+      return
+    }
+    if (!_uiState.value.isStreaming) return
+    _uiState.update { it.copy(isScanningUpi = true) }
+    upiScanner.speak("Look at the QR code.")
+    upiScanJob =
+        viewModelScope.launch {
+          try {
+            repeat(12) {
+              if (!_uiState.value.isStreaming) return@launch
+              val bitmap = captureBitmapForScan()
+              if (bitmap != null) {
+                val upi = withContext(Dispatchers.Default) { upiScanner.findUpiQr(bitmap) }
+                if (upi != null) {
+                  upiScanner.pay(upi)
+                  return@launch
+                }
+              }
+              delay(1500)
+            }
+            upiScanner.speak("No UPI QR code found. Try again closer.")
+          } finally {
+            _uiState.update { it.copy(isScanningUpi = false) }
+          }
+        }
+  }
+
+  private suspend fun captureBitmapForScan(): Bitmap? {
+    var result: Bitmap? = null
+    stream
+        ?.capturePhoto()
+        ?.onSuccess { photoData ->
+          result = withContext(Dispatchers.Default) { decodePhoto(photoData) }
+        }
+        ?.onFailure { error, _ -> Log.w(TAG, "UPI scan capture failed: ${error.description}") }
+    return result
+  }
+
   // MARK: - Recording
 
   fun toggleRecording(requestRecordAudioPermission: suspend () -> Boolean) {
@@ -691,6 +742,7 @@ class CameraViewModel(
     audioInputHandler.cleanup()
     videoRecorder.close()
     recorderChannel.close()
+    upiScanner.close()
   }
 
   class Factory(

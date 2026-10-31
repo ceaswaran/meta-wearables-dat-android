@@ -160,6 +160,7 @@ fun CameraScreen(
           onStartPreview = cameraViewModel::startStreaming,
           onStopPreview = cameraViewModel::stopStreaming,
           onCapturePhoto = cameraViewModel::capturePhoto,
+          onScanAndPay = cameraViewModel::scanAndPay,
           onToggleRecording = { cameraViewModel.toggleRecording(onRequestRecordAudioPermission) },
           onToggleMic = cameraViewModel::toggleMic,
           onUpdateFirmware = { activity?.let { wearablesViewModel.openFirmwareUpdate(it) } },
@@ -426,6 +427,7 @@ private fun BottomBar(
     onStartPreview: () -> Unit,
     onStopPreview: () -> Unit,
     onCapturePhoto: () -> Unit,
+    onScanAndPay: () -> Unit,
     onToggleRecording: () -> Unit,
     onToggleMic: () -> Unit,
     onUpdateFirmware: () -> Unit,
@@ -445,6 +447,13 @@ private fun BottomBar(
           onClick = onUpdateFirmware,
       )
     } else {
+      if (ui.isStreaming || ui.isScanningUpi) {
+        SwitchButton(
+            modifier = Modifier.testTag("upi_scan_pay_button"),
+            label = if (ui.isScanningUpi) "Scanning… tap to stop" else "Scan & Pay (UPI)",
+            onClick = onScanAndPay,
+        )
+      }
       CaptureRow(
           ui = ui,
           onStartPreview = onStartPreview,

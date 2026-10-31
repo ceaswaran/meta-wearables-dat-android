@@ -42,9 +42,9 @@ android {
     // Without Developer Mode, these values need to be set with credentials from the app registered
     // in Wearables Developer Center
     manifestPlaceholders["mwdat_application_id"] =
-        localProperties.getProperty("mwdat_application_id", "")
+        localProperties.getProperty("mwdat_application_id", "0")
     manifestPlaceholders["mwdat_client_token"] =
-        localProperties.getProperty("mwdat_client_token", "")
+        localProperties.getProperty("mwdat_client_token", "0")
   }
 
   buildTypes {
@@ -74,6 +74,7 @@ dependencies {
   implementation(libs.mwdat.core)
   implementation(libs.mwdat.camera)
   implementation(libs.mwdat.mockdevice)
+  implementation(libs.mlkit.barcode.scanning)
   androidTestImplementation(libs.androidx.ui.test.junit4)
   androidTestImplementation(libs.androidx.test.uiautomator)
   androidTestImplementation(libs.androidx.test.rules)
