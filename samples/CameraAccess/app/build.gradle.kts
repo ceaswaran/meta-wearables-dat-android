@@ -75,6 +75,7 @@ dependencies {
   implementation(libs.mwdat.camera)
   implementation(libs.mwdat.mockdevice)
   implementation(libs.mlkit.barcode.scanning)
+  implementation(libs.zxing.core)
   androidTestImplementation(libs.androidx.ui.test.junit4)
   androidTestImplementation(libs.androidx.test.uiautomator)
   androidTestImplementation(libs.androidx.test.rules)
